@@ -1,0 +1,78 @@
+<div class="well">
+	<button class="btn btn-primary" ng-click="createUser()">Create login</button>
+	<div class="row">
+		<div class="col-md-2">
+			<button ng-click="addItem(inputVal, 1)" class="btn btn-danger width-100per">
+				<span class="glyphicon glyphicon-minus"></span>
+			</button>
+		</div>
+		<div class="col-md-8">
+			<input type="number" ng-model="inputVal" class="form-control width-100per text-right" placeholder="$0.00" title="Valor: $0.00">
+		</div>
+		<div class="col-md-2">
+			<button ng-click="addItem(inputVal, 0)" class="btn btn-success width-100per">
+				<span class="glyphicon glyphicon-plus"></span>
+			</button>
+		</div>
+	</div>
+	<br>
+	<!-- Nav tabs -->
+	<ul class="nav nav-tabs" role="tablist">
+		<li ng-repeat="(kFinanza, finanza) in finanzas">
+			<a href="#home" role="tab" data-toggle="tab">{{kFinanza}}</a>
+		</li>
+	</ul>
+	<div ng-repeat="(kFinanza, finanza) in finanzas">
+		<input type="text" id="{{ (finanza.general_data.month | lowercase) +'_'+ finanza.general_data.year }}" value="{{ kFinanza }}">
+
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="text-success">Obtuve</h3>
+			</div>
+			<div class="col-md-6">
+				<h3 class="text-right text-success">{{ sumTotal("value", finanza["days"]).success() | currency }} COP</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="text-danger">Gasté</h3>
+			</div>
+			<div class="col-md-6">
+				<h3 class="text-right text-danger">{{ sumTotal("value", finanza["days"]).danger() | currency }} COP</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<h3 class="text-{{ (sumTotal().total() < 0) ? 'danger' : 'success' }}">Total</h3>
+			</div>
+			<div class="col-md-6">
+				<h3 class="text-right text-{{ (sumTotal().total() < 0) ? 'danger' : 'success' }}">{{ sumTotal().total() | currency }} COP</h3>
+			</div>
+		</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<div class="text-right fontSize-30pix" contentEditable>{{ finanza.general_data['year'] }}</div>
+				<div class="text-right"><small contentEditable>{{ kFinanza }}</small></div>
+			</div>
+			<div class="panel-body">
+				<div ng-repeat="(kDay, day) in finanza['days'] | orderBy:'index' | orderBy:'priority' | orderBy:'status'">
+					<div class="panel panel-{{ getStringTool(day.status).status()}}" ng-show="!day.removed">
+						<div class="panel-heading">
+							<div class="clearfix">
+								<small class="pull-left" contentEditable>{{ getStringTool(day.day.split('_')[0]).day() }} {{ day.day.split('_')[1] }}</small>
+								<a href="" ng-click="removeItem(kDay, finanza['days'])" class="pull-right text-{{ getStringTool(day.status).status()}}"><span class="glyphicon glyphicon-trash"></span></a>
+							</div>
+							<div align="right" class="fontSize-30pix"><span contentEditable>{{ day.value | currency }}</span> <span contentEditable>{{ day.coin }}</span></div>
+							<div class="panel-title text-justify">
+								<span contentEditable id="title_{{kDay}}" ng-blur="editItem(kDay, 'title')">{{ day.title }}</span>.
+								<small contentEditable id="description_{{kDay}}" ng-blur="editItem(kDay, 'description')">{{ day.description }}</small>
+							</div>
+							<span class="label label-{{ getStringTool(day.status).status()}} marginRight-10px" ng-repeat="tag in day.tags">{{ tag }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br>
+</div>
